@@ -6,7 +6,7 @@ Vagrant.configure("2") do |config|
     wordpress.vm.box = "ubuntu/focal64"
     wordpress.vm.box_check_update = false
     wordpress.vm.hostname = "wordpress"
-    wordpress.vm.provision "shell", path: "provision.sh"
+    wordpress.vm.provision "shell", path: "provision_wordpress.sh"
     wordpress.vm.network "forwarded_port", guest: 80, host: 8080, id: "nginx"
     wordpress.vm.network "private_network", ip: "192.168.100.2", nic_type: "virtio", virtualbox__intnet: "keepcoding"
     wordpress.vm.synced_folder "./wordpress", "/var/www/wordpress"
@@ -15,7 +15,7 @@ Vagrant.configure("2") do |config|
       trigger.run_remote = {inline: "mysqldump --add-drop-table -u root wordpress > /vagrant/mariadb/wordpress_db.sql"}
     end
     wordpress.vm.provider "virtualbox" do |vb|
-      vb.memory = "2048"
+      vb.memory = 2048
       vb.default_nic_type = "virtio"
     end
   end
@@ -24,9 +24,13 @@ Vagrant.configure("2") do |config|
     elk.vm.box = "ubuntu/focal64"
     elk.vm.box_check_update = false
     elk.vm.hostname = "elk"
+    elk.vm.provision "shell", path: "provision_elk.sh"
+    elk.vm.network "forwarded_port", guest: 9200, host: 9200, id: "elasticsearch"
+    elk.vm.network "forwarded_port", guest: 5601, host: 5601, id: "kibana"
     elk.vm.network "private_network", ip: "192.168.100.3", nic_type: "virtio", virtualbox__intnet: "keepcoding"
     elk.vm.provider "virtualbox" do |vb|
-      vb.memory = "512"
+      vb.memory = 4096
+      vb.cpus = 2
       vb.default_nic_type = "virtio"
     end
   end  
